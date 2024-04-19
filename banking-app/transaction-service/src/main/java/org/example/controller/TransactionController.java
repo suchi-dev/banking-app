@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.TransactionRequest;
 import org.example.dto.TransactionResponse;

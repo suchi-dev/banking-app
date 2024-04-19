@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import io.micrometer.observation.annotation.Observed;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.AccountRequest;
 import org.example.dto.AccountResponse;
@@ -8,6 +9,7 @@ import org.example.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -29,10 +31,33 @@ public class AccountController {
         return accountService.getAccountResponseList();
     }
 
-    @GetMapping("/{accountNumber}")
+
+
+    @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AccountResponse getByAccountNo(@PathVariable Long accountNumber){
         return accountService.getAccountResponseByNumber(accountNumber);
+    }
+
+    @PostMapping("/withdraw/{accountNumber}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public AccountResponse withdrawAmt(@PathVariable Long accountNumber,
+                                       @RequestParam BigDecimal withdrawAmt){
+        return accountService.withdrawAmt(accountNumber, withdrawAmt);
+    }
+    @PostMapping("/deposit/{accountNumber}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public AccountResponse depositAmt(@PathVariable Long accountNumber,
+                                       @RequestParam BigDecimal depositAmt){
+        return accountService.depositAmt(accountNumber, depositAmt);
+    }
+
+    @GetMapping("/balance/{accountNumber}")
+    @ResponseStatus(HttpStatus.OK)
+    public BigDecimal getBalance(@PathVariable Long accountNumber){
+        return accountService.getAccountBalance(accountNumber);
     }
 
 }
