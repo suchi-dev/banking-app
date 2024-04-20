@@ -6,7 +6,11 @@ import org.example.dto.AccountRequest;
 import org.example.dto.AccountResponse;
 import org.example.repository.AccountRepository;
 import org.example.model.Account;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,10 +22,29 @@ import java.util.Random;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final WebClient.Builder webClientBuilder;
 
-    public void createAccount(AccountRequest accountRequest){
+    public void createAccount(String authToken, AccountRequest accountRequest){
+
+        // Call account service for validating balance on sendAccount,
+        //      and presence of toAccount
+
+        WebClient webClientAccount = webClientBuilder.baseUrl("http://identity-service").build();
+
+        webClientAccount.get().uri(
+                        uriBuilder ->
+                                uriBuilder.path("/api/auth/validate")
+                                        .queryParam("token", authToken)
+                                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError,
+                        error -> Mono.error(new RuntimeException("Invalid Token")))
+                .bodyToMono(String.class)
+                .block();
+
         Random random = new Random();
         long accountNumber = random.nextLong(1000000000000L);
+        log.info("Generated a token:");
 
         Account account = Account.builder()
                 .accountHolderName(accountRequest.getAccountHolderName())
@@ -32,6 +55,7 @@ public class AccountService {
                 .userName(accountRequest.getUserName()).build();
 
         accountRepository.save(account);
+        log.info("Account saved in repository:");
     }
 
     public List<AccountResponse> getAccountResponseList(){

@@ -80,17 +80,18 @@ public class AccountServiceTest {
 public void createAccount(){
 
 
-        AccountRequest accountReq = AccountRequest.builder()
-                .accountHolderName(account1.getAccountHolderName())
-                .accountNumber(accountNumber)
-                .emailId(account1.getEmailId())
-                .phoneNumber(account1.getPhoneNumber())
-                .password(account1.getPassword())
-                .userName(account1.getUserName()).build();
+    AccountRequest accountReq = AccountRequest.builder()
+            .accountHolderName(account1.getAccountHolderName())
+            .accountNumber(accountNumber)
+            .emailId(account1.getEmailId())
+            .phoneNumber(account1.getPhoneNumber())
+            .password(account1.getPassword())
+            .userName(account1.getUserName()).build();
 
     Mockito.when(accountRepositoryMock.save(ArgumentMatchers.any(Account.class)))
             .thenReturn(account1);
-    accountServiceMock.createAccount(accountRequest);
+    String authToken= "authToken";
+    accountServiceMock.createAccount(authToken, accountRequest);
     Mockito.verify(accountRepositoryMock,times(1)).save(ArgumentMatchers.any(Account.class));
     }
 
