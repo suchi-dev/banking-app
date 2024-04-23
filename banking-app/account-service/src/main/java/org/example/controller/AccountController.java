@@ -44,7 +44,7 @@ public class AccountController {
     }
 
 
-
+    @GetMapping("/{accountNumber}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     public AccountResponse getByAccountNo(@PathVariable Long accountNumber){
@@ -54,10 +54,19 @@ public class AccountController {
     @PostMapping("/withdraw/{accountNumber}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public AccountResponse withdrawAmt(@PathVariable Long accountNumber,
+    public ResponseEntity withdrawAmt(@PathVariable Long accountNumber,
                                        @RequestParam BigDecimal withdrawAmt){
-        return accountService.withdrawAmt(accountNumber, withdrawAmt);
+
+        try{
+        AccountResponse accountResponse =accountService.withdrawAmt(accountNumber, withdrawAmt);
+        return new ResponseEntity(accountResponse, HttpStatus.OK);
+        }catch(RuntimeException re){
+            return new ResponseEntity(re.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
     }
+
+
     @PostMapping("/deposit/{accountNumber}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody

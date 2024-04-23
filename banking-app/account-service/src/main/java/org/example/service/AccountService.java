@@ -52,6 +52,8 @@ public class AccountService {
                 .emailId(accountRequest.getEmailId())
                 .phoneNumber(accountRequest.getPhoneNumber())
                 .password(accountRequest.getPassword())
+                .balance(accountRequest.getBalance())
+                .active(true)
                 .userName(accountRequest.getUserName()).build();
 
         accountRepository.save(account);
@@ -98,6 +100,7 @@ public class AccountService {
             accountRepository.save(account);
         }else {
             log.error("Insufficient balance");
+            throw new RuntimeException("Insufficient Balance");
         }
 
         return mapToAccountResponse(account);
